@@ -1,0 +1,99 @@
+{% extends 'inc/dashboard.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
+{% bootstrap_javascript %}
+
+{% block custom_css %}
+<style>
+    th, tr{
+        padding: 10px !important;
+    }
+</style>
+
+{% endblock custom_css %}
+
+{% block title %}Dashboard{% endblock title %}
+
+
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-3 mb-3">
+    <h1 class="h3">Notifications</h1>
+    
+</div>
+
+<div> 
+
+
+    <div class="mt-2">
+        
+
+        <div class="card text-left sections mt-4" id="s-s">
+            <div class="card-header bg-white">
+              <h5 class="my-2">All products Notifications</h5>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-striped m-0 p-0">
+                <thead class="bg-secondary text-white">
+                  <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Notification</th>
+                    <th scope="col">Created at</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if not notifications %}
+                  <tr>
+                    <td colspan="3">
+                      No notification exists
+                    </td>
+                  </tr>
+                  {% endif %}
+
+                  {% for notification in notifications %}
+                  <tr>
+                    <td>
+                        <a href="{% url 'products:edit-product' notification.product.policy_key notification.product.product_id %}" class="text-decoration-none">
+                            {{ notification.product }}
+                        </a>
+                    </td>
+                    <td>
+                        <b>{{ notification.subject }} {% if notification.is_new %}<span class="badge badge-pill bg-danger text-white">NEW</span>{% endif %}</b><br>
+                        {{ notification.body }}
+                    </td>
+                    <td>{{ notification.updated_at }}</td>  
+                  </tr>
+                  {% endfor %}
+                  
+                </tbody>
+            </table>
+              
+            </div>
+          </div>
+
+
+
+          <script>
+            $(document).ready(function () {
+              $("#id_policy").val('{{request.GET.policy}}');
+              $("#id_product").val('{{request.GET.product}}');
+              
+
+              $(".change-form").on('change', function () {
+                $("#filter-form").submit();
+              })
+            })
+          </script>
+        
+ 
+
+
+    </div>
+</div>
+
+
+{% endblock content %}

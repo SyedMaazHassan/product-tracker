@@ -1,0 +1,28 @@
+{% load static %}
+<header class="navbar py-2 navbar-dark sticky-top bg-white flex-md-nowrap p-0 shadow">
+    <a class="d-flex align-items-center bg-white col-md-3 col-lg-2 me-0 px-3 p-0 text-center my-0 py-0 text-decoration-none" href="#">
+        <img src="{% static 'img/mylogo.jpeg' %}" style="width: 60px;" class="bg-white" alt="">
+        <h4 class="text-dark ms-2" style="text-align: left;">Products Tracker</h4>
+    </a>
+
+    
+
+
+    <button class="border navbar-toggler btn-dark position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
+        data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon text-dark" style="color: black !important;"></span>
+    </button>
+    <form action="{% url 'products:search-products' %}" method="GET" class="w-100 mb-0 d-flex align-items-center">
+        <input class="form-control form-control-secondary w-100" style="border-radius: 0px !important;" type="text"
+            placeholder="Search products by id, name or supplier" value="" aria-label="Search" name="query" required>
+    </form>
+    <div class="navbar-nav">
+        <div class="nav-item text-nowrap">
+            <!-- <button type="button" name="" id="" class="btn btn-primary btn-lg btn-block">Logout</button> -->
+            <!-- <a class="nav-link btn btn-outline-success text-success px-3" href="#">Sign out</a> -->
+            <a href="{% url 'logout' %}"   title="Logout">
+                <i class="material-icons mk-pointer text-primary mx-4">logout</i>
+            </a>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,269 @@
+{% extends 'inc/dashboard.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
+{% bootstrap_javascript %}
+
+
+{% block title %}Dashboard{% endblock title %}
+
+
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-3 mb-3">
+    <h1 class="h3">Dashboard</h1>
+    <!-- <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+            <span data-feather="calendar"></span>
+            This week
+        </button>
+    </div> -->
+
+    
+</div>
+
+<div> 
+    <div class="card text-left bg-secondary text-white mb-4">
+        <div class="card-body">
+          <h4 class="card-title">Overall Policy Level Analytics</h4>
+          <p class="card-text">See overview of all policies having different no. of products, orders & inventory levels.</p>  
+        </div>
+      </div>
+  
+
+
+    <div class="radius-10 border p-4 mb-4 shadow">
+        <h4 class="text-secondary">Inventory Levels by Policy Over Last 12 Months</h4>
+        <canvas id="inventory-levels" height="80"></canvas>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="radius-10 border p-4 mb-4 shadow">
+                <h4 class="text-secondary">Order quantity analysis</h4>
+                <canvas id="order-chart" height="75"></canvas>
+            </div>
+        
+
+
+        </div>
+
+        <div class="col-sm-8">
+            <div class="radius-10 border p-4 mb-4 shadow">
+                <h4 class="text-secondary">Products Quantities By Policy Over Last 12 Months</h4>
+                <canvas id="products-chart" height="132"></canvas>
+            </div>        
+        </div>
+    </div>
+
+
+    <div class="card text-left bg-secondary text-white" id="single-product-section">
+      <div class="card-body">
+        <h4 class="card-title">Product Detailed analysis</h4>
+        <p class="card-text">Select Product from dropdown to view detailed analysis of the product</p>
+
+        <form action="" method="get" id="product-form">
+
+            <div class="form-group w-25">
+            <select class="form-control" name="product" id="single-product" required>
+                <option value="" selected>Select Product</option>
+                {% for product in products %}
+                    <option value="{{ product.id }}">{{ product }}</option>
+                {% endfor %}
+            </select>
+            </div>
+        </form>
+
+      </div>
+    </div>
+
+    {% if product_charts %}
+    <div class="row mt-4">
+        
+
+        <div class="col-sm-12">
+            <div class="radius-10 border p-4 mb-4 shadow">
+                <h4 class="text-secondary">Inventory Levels & Total Ordered Quantity Over Last 12 Months</h4>
+                <canvas id="product-inventory-chart" height="100"></canvas>
+            </div>        
+        </div>
+
+
+        <div class="col-sm-3">
+            <div class="radius-10 border p-4 mb-4 shadow">
+                <h4 class="text-secondary">Order status</h4>
+                <canvas id="product-order-status-chart" height="370"></canvas>
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-9">
+            <div class="radius-10 border p-4 mb-4 shadow">
+                <h4 class="text-secondary">Stockout Count Over Last 12 Months</h4>
+                <canvas id="stockout-chart" height="100"></canvas>
+            </div>        
+        </div>
+
+
+        <div class="col-sm-12">
+            <div class="radius-10 border p-4 mb-4 shadow">
+                <h4 class="text-secondary">Orders Lead Time Analysis of Last 12 Months</h4>
+                <canvas id="leadtime-chart" height="100"></canvas>
+
+            </div>        
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let product_charts = {{product_charts|safe}};
+
+    if (!$.isEmptyObject(product_charts)) {
+        // Product inventory levels
+        let product_inventory_data = JSON.parse('{{ product_charts.product_inventory|safe }}');
+        console.log(product_inventory_data);
+        const product_inventory_level_ctx = document.getElementById('product-inventory-chart').getContext('2d');
+        new Chart(product_inventory_level_ctx, {
+            type: 'bar',
+            data: product_inventory_data,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            },
+        });    
+
+        // Product order status
+        let product_order_status = JSON.parse('{{ product_charts.product_order_status|safe }}');
+        const product_order_status_ctx = document.getElementById('product-order-status-chart').getContext('2d');
+        new Chart(product_order_status_ctx, {
+            type: 'bar',
+            data: product_order_status,
+        });        
+
+
+        // Product stockout
+        let product_stockout_data = JSON.parse('{{ product_charts.product_stockout|safe }}');
+        const product_stockout_ctx = document.getElementById('stockout-chart').getContext('2d');
+        new Chart(product_stockout_ctx, {
+            type: 'line',
+            data: product_stockout_data,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            },
+        });   
+        
+        
+        // Lead time analysis
+        let product_leadtime_data = JSON.parse('{{ product_charts.product_leadtime|safe }}');
+        const product_leadtime_ctx = document.getElementById('leadtime-chart').getContext('2d');
+        new Chart(product_leadtime_ctx, {
+            type: 'bar',
+            data: product_leadtime_data,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            },
+        });   
+        
+    }
+
+
+
+
+    // Sample data
+    var data = JSON.parse('{{ inventory_levels|escapejs }}');
+
+
+    // Create line chart
+    const ctx = document.getElementById('inventory-levels').getContext('2d');
+    const lineChart = new Chart(ctx, {
+        type: 'line',
+        data: data
+    });
+
+    // setup pie chart
+    var order_data = JSON.parse('{{ orders_chart|escapejs }}');
+     // Chart.js configuration
+    var order_ctx = document.getElementById('order-chart').getContext('2d');
+    var myPieChart = new Chart(order_ctx, {
+        type: 'pie',
+        data: order_data,
+        options: {
+            easing: 'linear',
+            // Your chart options here
+        }
+    });
+
+
+    var product_data = JSON.parse('{{ products_chart|escapejs }}');
+     // Chart.js configuration
+    var product_ctx = document.getElementById('products-chart').getContext('2d');
+    var myProductChart = new Chart(product_ctx, {
+        type: 'bar',
+        data: product_data,
+        options: {
+            indexAxis: 'y',
+            // Elements options apply to all of the options unless overridden in a dataset
+            // In this case, we are setting the border of each horizontal bar to be 2px wide
+            elements: {
+                bar: {
+                    borderWidth: 2,
+                }
+            },
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            }
+        }
+
+    });
+
+    // Check if the URL contains a parameter named 'product'
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('product')) {
+        $('#single-product').val('{{ request.GET.product }}');
+        // Scroll to the element with the id 'single-product-section' with smooth behavior
+        const targetElement = document.getElementById('single-product-section');
+        const scrollOffset = 80; // Adjust this value as needed
+        const targetPosition = targetElement.offsetTop - scrollOffset;
+        window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+        });
+    }
+
+    $(document).ready(function () {
+        $("#single-product").on('change', function () {
+            let selected_product = $(this).val();
+            if (selected_product) {
+                $("#product-form").submit()
+            }
+        })
+    })
+</script>
+
+{% endblock content %}

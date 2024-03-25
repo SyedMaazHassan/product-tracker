@@ -1,0 +1,91 @@
+{% extends 'inc/dashboard.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
+{% bootstrap_javascript %}
+
+{% block custom_css %}
+<style>
+    th, tr{
+        padding: 10px !important;
+    }
+</style>
+
+{% endblock custom_css %}
+
+{% block title %}Search products{% endblock title %}
+
+
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-3 mb-3">
+    <h1 class="h3">Product Search</h1>  
+    {% if products %}
+        <h1 class="h5">{{products.count}} products found for query <b class="text-secondary">{{ request.GET.query }}</b></h1>
+    {% endif %}
+</div>
+
+
+<div>
+    {% if not products %}
+    <div class="">
+        No product found for this query: {{ request.GET.query }}
+    </div>
+    {% endif %}
+
+    {% if products %}
+
+    <div class="card text-left">
+        <div class="card-header bg-white">
+            <h5 class="my-2">Products</h5>
+        </div>
+      <div class="card-body p-0">
+        <table class="table table-striped m-0 p-0">
+            <thead class="bg-secondary text-white">
+              <tr>
+                <th scope="col">Product ID</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Supplier</th>
+                <th scope="col">Inventory Level</th>
+                <th scope="col">Policy Type</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+    
+    
+              {% for product in products %}
+              <tr>
+                <th>{{ product.product_id }}</th>
+                <td>{{ product.product_name }}</td>
+                <td>{{ product.product_supplier }}</td>
+                <td>{{ product.inventory_level }}</td>
+                <td>{{ product.get_policy.name }}</td>
+    
+                <td>
+                    <a href="{% url 'products:edit-product' product.get_policy.key product.product_id %}" class="text-decoration-none">
+                        <i class="material-icons mk-pointer">edit</i>
+                    </a>
+                    <a onclick="return confirm('Are you sure you want to delete this product?')" href="{% url 'products:delete-product' product.product_id %}" class="text-decoration-none">
+                      <i class="text-danger material-icons mk-pointer">delete</i>
+                    </a>
+                </td>
+    
+              </tr>
+              {% endfor %}
+              
+            </tbody>
+        </table>
+      </div>
+    </div>
+
+ 
+
+    {% endif %}
+</div>
+
+
+{% endblock content %}

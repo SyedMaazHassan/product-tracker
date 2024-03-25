@@ -1,0 +1,64 @@
+{% extends 'inc/dashboard.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
+{% bootstrap_javascript %}
+
+{% block custom_css %}
+<style>
+    th, tr{
+        padding: 10px !important;
+    }
+</style>
+
+{% endblock custom_css %}
+
+{% block title %}Dashboard{% endblock title %}
+
+
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-3 mb-3">
+    <h1 class="h3">Edit Order</h1>
+</div>
+
+<div> 
+
+
+    <div class="mt-2">
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form action="" method="post">
+                    {% csrf_token %}
+
+                    <div class="card text-left">
+                        <div class="card-header">
+                            <h5 class="my-2">Edit Order Form</h5>
+                        </div>
+                        <div class="card-body">
+                            {% bootstrap_form form %}
+                            <button type="submit" name="" id="" class="btn btn-primary btn-block">Save Order</button>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+<script>
+    $("input, textarea").prop('placeholder', '');
+    $("#id_quantity, #id_estimated_days").prop('min', '1');
+</script>
+
+
+{% endblock content %}

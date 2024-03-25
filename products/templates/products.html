@@ -1,0 +1,265 @@
+{% extends 'inc/dashboard.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
+{% bootstrap_javascript %}
+
+{% block custom_css %}
+<style>
+    th, tr{
+        padding: 10px !important;
+    }
+</style>
+
+{% endblock custom_css %}
+
+{% block title %}Dashboard{% endblock title %}
+
+
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-3 mb-3">
+    <h1 class="h3">Products</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Add product
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'products:add-product' 's-s' %}">S,s Policy</a></li>
+              <li><a class="dropdown-item" href="{% url 'products:add-product' 't-s' %}">T,S Policy</a></li>
+              <li><a class="dropdown-item" href="{% url 'products:add-product' 'r-q' %}">R,Q Policy</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    
+</div>
+
+<div> 
+
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab" aria-controls="tab1" aria-selected="true">Continuous review policy (s, S)</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab" aria-controls="tab2" aria-selected="false">Periodic review policy (T, S)</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab" aria-controls="tab3" aria-selected="false">Continuous review policy (R, Q)</button>
+    </li>
+  </ul>
+
+    <div class="mt-4">
+
+
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+
+          <div class="card text-left sections" id="s-s">
+            <div class="card-header bg-white">
+              <h5 class="my-2">Continuous review policy (s, S)</h5>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-striped m-0 p-0">
+                <thead class="bg-secondary text-white">
+                  <tr>
+                    <th scope="col">Product ID</th>
+                    <th scope="col">Order Quantity (Q)</th>
+                    <th scope="col">Product Supplier</th>
+                    <th scope="col">Inventory Level</th>
+                    <th scope="col">Stock Level</th>
+                    <th scope="col">Created at</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if not ss %}
+                    <tr>
+                      <td colspan="7">
+                        No product in s, S policy
+                      </td>
+                    </tr>
+
+                  {% endif %}
+
+                  {% for policy in ss %}
+                  <tr>
+                    <th>{{ policy.product.product_id }}</th>
+                    <td>{{ policy.order_quantity }}</td>
+                    <td>{{ policy.product.product_supplier }}</td>
+                    <td>{{ policy.product.inventory_level }}</td>
+                    <td>
+                        <span class="{% if policy.product.stock_level == 'Low' %}text-danger{% else %}text-success{% endif %}">{{ policy.product.stock_level }}</span>
+                    </td>
+                    <td>{{ policy.product.created_at.date }}</td>
+                    <td>
+                        <a href="{% url 'products:edit-product' policy.product.get_policy.key policy.product.product_id %}" class="text-decoration-none">
+                            <i class="material-icons mk-pointer">edit</i>
+                        </a>
+                        <a onclick="return confirm('Are you sure you want to delete this product?')" href="{% url 'products:delete-product' policy.product.product_id %}" class="text-decoration-none">
+                          <i class="text-danger material-icons mk-pointer">delete</i>
+                        </a>
+                    </td>
+  
+                  </tr>
+                  {% endfor %}
+                  
+                </tbody>
+            </table>
+              
+            </div>
+          </div>
+
+
+        </div>
+
+        <div class="tab-pane" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+
+          <div class="card text-left sections" id="t-s">
+            <div class="card-header bg-white">
+              <h5 class="my-2">Periodic review policy (T, S)</h5>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-striped m-0 p-0">
+                <thead class="bg-secondary text-white">
+                  <tr>
+                    <th scope="col">Product ID</th>
+                    <th scope="col">Order Quantity (Q)</th>
+                    <th scope="col">Product Supplier</th>
+                    <th scope="col">Inventory Level</th>
+                    <th scope="col">Stock Level</th>
+                    <th scope="col">Created at</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if not ts %}
+                  <tr>
+                    <td colspan="7">
+                      No product in T, S policy
+                    </td>
+                  </tr>
+                  {% endif %}
+
+                  {% for policy in ts %}
+                  <tr>
+                    <th>{{ policy.product.product_id }}</th>
+                    <td>{{ policy.order_quantity }}</td>
+                    <td>{{ policy.product.product_supplier }}</td>
+                    <td>{{ policy.product.inventory_level }}</td>
+                    <td>
+                        <span class="{% if policy.product.stock_level == 'Low' %}text-danger{% else %}text-success{% endif %}">{{ policy.product.stock_level }}</span>
+                    </td>
+                    <td>{{ policy.product.created_at.date }}</td>
+                    <td>
+                        <a href="{% url 'products:edit-product' policy.product.get_policy.key policy.product.product_id %}" class="text-decoration-none">
+                            <i class="material-icons mk-pointer">edit</i>
+                        </a>
+                        <a onclick="return confirm('Are you sure you want to delete this product?')" href="{% url 'products:delete-product' policy.product.product_id %}" class="text-decoration-none">
+                          <i class="text-danger material-icons mk-pointer">delete</i>
+                        </a>
+                    </td>
+                  
+  
+                  </tr>
+                  {% endfor %}
+                  
+                </tbody>
+            </table>
+              
+            </div>
+          </div>
+
+        </div>
+
+        <div class="tab-pane" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
+
+
+          <div class="card text-left sections" id="r-q">
+            <div class="card-header bg-white">
+              <h5 class="my-2">Continuous review policy (R, Q)</h5>
+            </div>
+            <div class="card-body p-0">
+              <table class="table table-striped m-0 p-0">
+                <thead class="bg-secondary text-white">
+                  <tr>
+                    <th scope="col">Product ID</th>
+                    <th scope="col">EOQ</th>
+                    <th scope="col">Reorder Point</th>
+                    <th scope="col">Distribution</th>
+                    <th scope="col">Inventory Level</th>
+                    <th scope="col">Stock Level</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if not rq %}
+                  <tr>
+                    <td colspan="7">
+                      No product in R, Q policy
+                    </td>
+                  </tr>
+                  {% endif %}
+
+                  {% for policy in rq %}
+                  <tr>
+                    <th>{{ policy.product.product_id }}</th>
+                    <td>{{ policy.eoq }}</td>
+                    <td>{{ policy.reorder_point }}</td>
+                    <td>{{ policy.product.distribution }}</td>
+                    <td>{{ policy.product.inventory_level }}</td>
+                    <td>
+                        <span class="{% if policy.product.stock_level == 'Low' %}text-danger{% else %}text-success{% endif %}">{{ policy.product.stock_level }}</span>
+                    </td>
+                    <td>
+                        <a href="{% url 'products:edit-product' policy.product.get_policy.key policy.product.product_id %}" class="text-decoration-none">
+                            <i class="material-icons mk-pointer">edit</i>
+                        </a>
+                        <a onclick="return confirm('Are you sure you want to delete this product?')" href="{% url 'products:delete-product' policy.product.product_id %}" class="text-decoration-none">
+                          <i class="text-danger material-icons mk-pointer">delete</i>
+                        </a>
+                    </td>
+  
+                  </tr>
+                  {% endfor %}
+                  
+                </tbody>
+            </table>
+              
+            </div>
+          </div>
+         
+        
+        </div>
+
+      </div>
+
+
+
+      
+
+
+     
+
+
+    
+
+        
+
+     
+        
+
+        
+ 
+
+
+    </div>
+</div>
+
+
+{% endblock content %}

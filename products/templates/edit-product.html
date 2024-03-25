@@ -1,0 +1,193 @@
+{% extends 'inc/dashboard.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
+{% bootstrap_javascript %}
+
+{% block title %}Edit Product in {{ selected_policy }}{% endblock title %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-3 mb-3">
+    <h1 class="h3">Edit Product in {{ selected_policy }}</h1>
+</div>
+
+<div> 
+    <form action="" method="post">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-sm-8">               
+
+                <div>
+                    <div class="card text-left mb-3">
+                        <div class="card-header">
+                            <h6 class="my-2">Product Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for field in product_form %}
+                                    {% if field.label == 'Distribution' %}
+                                        {% if policy_name == 'r-q' %}
+                                            <div class="col-sm-6">
+                                                {% bootstrap_field field %}
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="col-sm-6">
+                                            {% bootstrap_field field %}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card text-left mb-3">
+                        <div class="card-header">
+                            <h6 class="my-2">Policy Inputs</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for field in form %}
+                                    <div class="col-sm-6">
+                                        {% bootstrap_field field %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+
+                                
+                            <div style="display: none;" class="sections" id="NormalDistribution">
+                                <h5 class="my-4">Normal Distribution</h5>
+
+                                <div class="row">
+                                    {% for field in normal_distribution_form %}
+                                        <div class="col-sm-6">
+                                            {% bootstrap_field field %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+
+
+                            <div style="display: none;" class="sections" id="UniformDistribution">
+                                <h5 class="my-4">Uniform Distribution</h5>
+
+                                <div class="row">
+                                    {% for field in uniform_distribution_form %}
+                                        <div class="col-sm-6">
+                                            {% bootstrap_field field %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+
+
+                            <div style="display: none;" class="sections" id="BetaDistribution">
+                                <h5 class="my-4">Beta Distribution</h5>
+
+                                <div class="row">
+                                    {% for field in beta_distribution_form %}
+                                        <div class="col-sm-6">
+                                            {% bootstrap_field field %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+
+
+                            <div style="display: none;" class="sections" id="GammaDistribution">
+                                <h5 class="my-4">Gamma Distribution</h5>
+
+                                <div class="row">
+                                    {% for field in gamma_distribution_form %}
+                                        <div class="col-sm-6">
+                                            {% bootstrap_field field %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Update Product</button>
+
+                </div>
+                
+            </div>
+
+            <div class="col-sm-4">
+                <div class="card text-left">
+                  <div class="card-header">
+                    <h6 class="my-2">Output</h6>
+                  </div>
+                  <div class="card-body">
+                    {% if policy_name == 'r-q' %}
+                        <div class="form-group mb-3">
+                            <label for="">Economic Order Quantity (EOQ)</label>
+                            <h5 class="mt-2">{{ product.get_policy.instance.eoq }}</h5>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="">Reorder Point (ROP)</label>
+                            <h5 class="mt-2">{{ product.get_policy.instance.reorder_point }}</h5>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="">Safety Stock</label>
+                            <h5 class="mt-2">{{ product.get_policy.instance.safety_stock }}</h5>
+                        </div>
+
+                    {% else %}
+
+                        <div class="form-group">
+                            <label for="">Order Quantity (Q)</label>
+                            <h5 class="mt-2">{{ product.get_policy.instance.order_quantity }}</h5>
+                        </div>
+
+                    {% endif %}
+
+                  </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("input, textarea").prop('placeholder', '');
+        $("input, textarea").prop('required', '');    
+
+        // Function to show/hide distribution sections based on selected distribution
+        function showSection(distribution) {
+            if (distribution) {
+                distribution = distribution.replace(" ", "");
+                $(".sections").hide();
+                $("#" + distribution).show();
+            } else {
+                $(".sections").hide();
+            }
+        }
+
+        // Event listener for distribution field change
+        $("#id_distribution").on('change', function () {
+            let distribution = this.value;
+            showSection(distribution);
+        });
+
+        // Initially show distribution section based on selected distribution
+        let distribution_value = $("#id_distribution").val();
+        showSection(distribution_value);
+    });
+</script>
+
+{% endblock content %}

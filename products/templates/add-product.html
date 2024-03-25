@@ -1,0 +1,187 @@
+{% extends 'inc/dashboard.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
+{% bootstrap_javascript %}
+
+{% block title %}Dashboard{% endblock title %}
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-3 mb-3">
+    <h1 class="h3">Add Product in {{selected_policy}}</h1>
+    
+
+    
+</div>
+
+<div> 
+    <form action="" method="post" id="main-product-form">
+        {% csrf_token %}
+        <div>
+            <div class="card text-left mb-3">
+            <div class="card-header">
+                <h6 class="my-2">Product Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for field in product_form %}
+                        {% if field.label == 'Distribution' %}
+                            {% if policy_name == 'r-q' %}
+                                <div class="col-sm-6">
+                                    {% bootstrap_field field %}
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="col-sm-6">
+                                {% bootstrap_field field %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            </div>
+
+            <div class="card text-left mb-3">
+                <div class="card-header">
+                    <h6 class="my-2">Policy Inputs</h6>
+                </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for field in form %}
+                        <div class="col-sm-6">
+                            {% bootstrap_field field %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div style="display: none;" class="sections" id="NormalDistribution">
+                    <h5 class="my-4">Normal Distribution</h5>
+
+                    <div class="row">
+                        {% for field in normal_distribution_form %}
+                            <div class="col-sm-6">
+                                {% bootstrap_field field %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+
+                <div style="display: none;" class="sections" id="UniformDistribution">
+                    <h5 class="my-4">Uniform Distribution</h5>
+
+                    <div class="row">
+                        {% for field in uniform_distribution_form %}
+                            <div class="col-sm-6">
+                                {% bootstrap_field field %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+
+                <div style="display: none;" class="sections" id="BetaDistribution">
+                    <h5 class="my-4">Beta Distribution</h5>
+
+                    <div class="row">
+                        {% for field in beta_distribution_form %}
+                            <div class="col-sm-6">
+                                {% bootstrap_field field %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+
+                <div style="display: none;" class="sections" id="GammaDistribution">
+                    <h5 class="my-4">Gamma Distribution</h5>
+
+                    <div class="row">
+                        {% for field in gamma_distribution_form %}
+                            <div class="col-sm-6">
+                                {% bootstrap_field field %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+
+            </div>
+            </div>
+
+            <button type="submit" name="" id="" class="btn btn-primary btn-lg btn-block">Submit Product</button>
+
+
+        </div>
+
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js"></script>
+
+
+<script>
+    $("input, textarea").prop('placeholder', '');
+    $("input, textarea").prop('required', '');    
+
+
+    function showSection(distribution) {
+        if (distribution) {
+            distribution = distribution.replace(" ", "");
+            $(".sections").hide();
+            $(`#${distribution}`).show();
+        }else{
+            $(".sections").hide();
+        }   
+    }
+
+    $("#id_distribution").on('change', function () {
+        let distribution = this.value;
+        showSection(distribution);
+    });
+
+    let distribution_value = $("#id_distribution").val();
+    showSection(distribution_value);
+
+
+
+    function populateFormWithFakeData() {
+        $("input").each(function() {
+            console.log();
+            if ($(this).attr('id') == 'id_inventory_level') {
+                $(this).val(Math.floor(Math.random() * (500 - 101 + 1)) + 101);
+            }else if ($(this).attr('id') == 'id_product_id') {
+                $(this).val(Math.floor(Math.random() * 10000));
+            } else if ($(this).attr('type') === 'number') {
+                // Generate a random number for number inputs
+                $(this).val(Math.floor(Math.random() * 100)); // Adjust range as needed
+            } else if ($(this).is('textarea')) {
+                // Generate a random text for textarea inputs
+                $(this).val(faker.lorem.sentence());
+            } else if ($(this).is('input[type="text"]')) {
+                // Generate a random noun for text inputs
+                $(this).val(faker.random.word());
+            }
+        });
+    }
+
+    // setTimeout(() => {
+    //     $("#id_distribution").val("Beta Distribution");
+    //     populateFormWithFakeData();
+    //     // $("#main-product-form").submit();
+    // }, 500);
+
+
+
+
+</script>
+
+
+{% endblock content %}
