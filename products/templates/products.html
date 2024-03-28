@@ -65,13 +65,13 @@
               <h5 class="my-2">Continuous review policy (s, S)</h5>
             </div>
             <div class="card-body p-0">
-              <table class="table table-striped m-0 p-0">
-                <thead class="bg-secondary text-white">
+              <table class="table table-striped m-0 p-0 w-100" id="s-s-table">
+                <thead class="text-white">
                   <tr>
-                    <th scope="col">Product ID</th>
-                    <th scope="col">Order Quantity (Q)</th>
+                    <th scope="col" class="text-center">Product ID</th>
+                    <th scope="col" class="text-center">Order Quantity (Q)</th>
                     <th scope="col">Product Supplier</th>
-                    <th scope="col">Inventory Level</th>
+                    <th scope="col" class="text-center">Inventory Level</th>
                     <th scope="col">Stock Level</th>
                     <th scope="col">Created at</th>
                     <th scope="col"></th>
@@ -89,10 +89,10 @@
 
                   {% for policy in ss %}
                   <tr>
-                    <th>{{ policy.product.product_id }}</th>
-                    <td>{{ policy.order_quantity }}</td>
+                    <th class="text-center">{{ policy.product.product_id }}</th>
+                    <td class="text-center">{{ policy.order_quantity }}</td>
                     <td>{{ policy.product.product_supplier }}</td>
-                    <td>{{ policy.product.inventory_level }}</td>
+                    <td class="text-center">{{ policy.product.inventory_level }}</td>
                     <td>
                         <span class="{% if policy.product.stock_level == 'Low' %}text-danger{% else %}text-success{% endif %}">{{ policy.product.stock_level }}</span>
                     </td>
@@ -125,13 +125,13 @@
               <h5 class="my-2">Periodic review policy (T, S)</h5>
             </div>
             <div class="card-body p-0">
-              <table class="table table-striped m-0 p-0">
-                <thead class="bg-secondary text-white">
+              <table class="table table-striped m-0 w-100 p-0" id="t-s-table">
+                <thead class="text-white">
                   <tr>
-                    <th scope="col">Product ID</th>
-                    <th scope="col">Order Quantity (Q)</th>
+                    <th scope="col" class="text-center">Product ID</th>
+                    <th scope="col" class="text-center">Order Quantity (Q)</th>
                     <th scope="col">Product Supplier</th>
-                    <th scope="col">Inventory Level</th>
+                    <th scope="col" class="text-center">Inventory Level</th>
                     <th scope="col">Stock Level</th>
                     <th scope="col">Created at</th>
                     <th scope="col"></th>
@@ -148,10 +148,10 @@
 
                   {% for policy in ts %}
                   <tr>
-                    <th>{{ policy.product.product_id }}</th>
-                    <td>{{ policy.order_quantity }}</td>
+                    <th class="text-center">{{ policy.product.product_id }}</th>
+                    <td class="text-center">{{ policy.order_quantity }}</td>
                     <td>{{ policy.product.product_supplier }}</td>
-                    <td>{{ policy.product.inventory_level }}</td>
+                    <td class="text-center">{{ policy.product.inventory_level }}</td>
                     <td>
                         <span class="{% if policy.product.stock_level == 'Low' %}text-danger{% else %}text-success{% endif %}">{{ policy.product.stock_level }}</span>
                     </td>
@@ -185,14 +185,14 @@
               <h5 class="my-2">Continuous review policy (R, Q)</h5>
             </div>
             <div class="card-body p-0">
-              <table class="table table-striped m-0 p-0">
-                <thead class="bg-secondary text-white">
+              <table class="table w-100 table-striped m-0 p-0" id="r-q-table">
+                <thead class="text-white">
                   <tr>
-                    <th scope="col">Product ID</th>
-                    <th scope="col">EOQ</th>
-                    <th scope="col">Reorder Point</th>
+                    <th scope="col" class="text-center">Product ID</th>
+                    <th scope="col" class="text-center">EOQ</th>
+                    <th scope="col" class="text-center">Reorder Point</th>
                     <th scope="col">Distribution</th>
-                    <th scope="col">Inventory Level</th>
+                    <th scope="col" class="text-center">Inventory Level</th>
                     <th scope="col">Stock Level</th>
                     <th scope="col"></th>
                   </tr>
@@ -208,11 +208,11 @@
 
                   {% for policy in rq %}
                   <tr>
-                    <th>{{ policy.product.product_id }}</th>
-                    <td>{{ policy.eoq }}</td>
-                    <td>{{ policy.reorder_point }}</td>
+                    <th class="text-center">{{ policy.product.product_id }}</th>
+                    <td class="text-center">{{ policy.eoq }}</td>
+                    <td class="text-center">{{ policy.reorder_point }}</td>
                     <td>{{ policy.product.distribution }}</td>
-                    <td>{{ policy.product.inventory_level }}</td>
+                    <td class="text-center">{{ policy.product.inventory_level }}</td>
                     <td>
                         <span class="{% if policy.product.stock_level == 'Low' %}text-danger{% else %}text-success{% endif %}">{{ policy.product.stock_level }}</span>
                     </td>
@@ -244,7 +244,27 @@
       
 
 
-     
+     <script>
+      $(document).ready(function () {
+        new DataTable('#s-s-table', {
+          pageLength: 25,
+          columnDefs: [
+              {
+                "defaultContent": "",
+                 "targets": "_all"
+              },
+              // { className: 'dt-center', targets: [1] }
+          ],
+        });
+        new DataTable('#t-s-table', {
+          pageLength: 25
+        });
+        new DataTable('#r-q-table', {
+          pageLength: 25
+        });
+           
+      })
+     </script>
 
 
     

@@ -128,7 +128,7 @@ def generate_estimated_days_data(product_id):
     month_list = []
     estimated_days_list = []
 
-    all_orders = Order.objects.filter(product_id = product_id)
+    all_orders = Order.objects.filter(status="Completed", product_id = product_id)
     all_order_names = []
     all_order_estimated_days = list(all_orders.values_list('estimated_days', flat=True))
     all_lead_times = []
@@ -140,14 +140,6 @@ def generate_estimated_days_data(product_id):
     estimated_days_data = {
         'labels': all_order_names,
         'datasets': [
-            {
-                'type': 'bar',
-                'label': 'Estimated Time (in days)',
-                'data': all_order_estimated_days,
-                'backgroundColor': 'rgba(113, 201, 245, 0.4)',
-                'borderColor': 'rgba(113, 201, 245, 0.4)',
-                'borderWidth': 1
-            },
             {
                 'type': 'line',
                 'label': 'Order Lead Time (in days)',

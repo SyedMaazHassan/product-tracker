@@ -44,12 +44,10 @@ class OrderForm(forms.ModelForm):
 
 class NormalDistributionForm(forms.Form):
     service_level = forms.FloatField(label='Service Level')
-    desired_service_level = forms.FloatField(label='Desired Service Level (Zα)')
     std_dev_lead_time = forms.FloatField(label='Standard Deviation of Demand during Lead Time (σLT)')
     std_dev_daily_demand = forms.FloatField(label='Standard Deviation of Daily Demand (σd)')
 
 class UniformDistributionForm(forms.Form):
-    service_level = forms.FloatField(label='Service Level')
     lower_bound = forms.FloatField(label='Lower Bound (a)')
     upper_bound = forms.FloatField(label='Upper Bound (b)')
 

@@ -148,13 +148,9 @@ class ContinuousReviewRQPolicy(models.Model):
     name = models.CharField(max_length=100, default="Continuous review policy (R, Q)", editable=False)
     abbr = models.CharField(max_length=100, default="R, Q", editable=False)
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='continuous_review_rq_policy')
-    setup_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Setup Cost (S)")
-    holding_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Holding Cost (H)")
     order_lead_time = models.IntegerField(verbose_name="Order Lead Time (LT)")
     average_demand = models.IntegerField(verbose_name="Average Demand (µd)")
     daily_demand = models.IntegerField(verbose_name="Daily Demand")
-    number_of_days_in_year = models.IntegerField(verbose_name="Number of Days in Year (D)")
-    average_lead_time = models.IntegerField(verbose_name="Average Lead Time")
     is_constant_lead_time = models.BooleanField(default=False)
     is_constant_demand = models.BooleanField(default=False)
 
@@ -163,15 +159,12 @@ class ContinuousReviewRQPolicy(models.Model):
     beta_distribution_inputs = models.JSONField(null=True, blank=True)
     gamma_distribution_inputs = models.JSONField(null=True, blank=True) 
 
-    eoq = models.IntegerField(blank=True, null=True, verbose_name="Economic Order Quantity (EOQ)")
+    eoq = models.IntegerField(blank=True, null=True, verbose_name="Order Quantity")
     reorder_point = models.IntegerField(blank=True, null=True, verbose_name="Reorder Point (ROP)")
     safety_stock = models.IntegerField(blank=True, null=True, verbose_name="Safety Stock")
 
     def calculate_eoq(self):
-        D = self.number_of_days_in_year * self.daily_demand
-        H = self.holding_cost
-        S = self.setup_cost
-        eoq = math.sqrt((2 * D * S) / H)
+        eoq = self.daily_demand * self.order_lead_time + self.safety_stock
         return eoq
 
     def calculate_rop_in_normal(self):
@@ -190,7 +183,7 @@ class ContinuousReviewRQPolicy(models.Model):
             std_LT = self.normal_distribution_inputs['std_dev_lead_time']
             safety_stock = z_alpha * std_LT
 
-            rop = (self.daily_demand * self.average_lead_time) + (self.daily_demand * safety_stock)
+            rop = (self.daily_demand * self.order_lead_time) + (self.daily_demand * safety_stock)
 
         if not self.is_constant_demand and self.is_constant_lead_time:
             std_d = self.normal_distribution_inputs['std_dev_daily_demand']
@@ -222,7 +215,7 @@ class ContinuousReviewRQPolicy(models.Model):
             rop = (µd * LT) + safety_stock
 
         if self.is_constant_demand and not self.is_constant_lead_time:             
-            rop = (self.daily_demand * self.average_lead_time) + (self.daily_demand * safety_stock)
+            rop = (self.daily_demand * self.order_lead_time) + (self.daily_demand * safety_stock)
 
         if not self.is_constant_demand and self.is_constant_lead_time:
             rop = (µd * LT) + safety_stock
@@ -237,7 +230,7 @@ class ContinuousReviewRQPolicy(models.Model):
     def calculate_rop_in_beta(self):
         print("Calculating RQ...")
 
-        quantile = 0.95
+        quantile = self.beta_distribution_inputs['service_level']/100
         µd = self.average_demand
         LT = self.order_lead_time
         alpha = self.beta_distribution_inputs['alpha']
@@ -246,13 +239,17 @@ class ContinuousReviewRQPolicy(models.Model):
         std_LT = self.beta_distribution_inputs['std_dev_lead_time']
         std_d = self.beta_distribution_inputs['std_dev_daily_demand']
         sqrt_LT = math.sqrt(LT)
-        safety_stock = std_LT
+        safety_stock = 0
+
 
         if not self.is_constant_lead_time and not self.is_constant_demand:
+            safety_stock = B_alpha * std_LT
             rop = (µd * LT) + (B_alpha * safety_stock)
 
+
         if self.is_constant_demand and not self.is_constant_lead_time:
-            rop = (self.daily_demand * self.average_lead_time) + (self.daily_demand * B_alpha * safety_stock)
+            safety_stock = self.daily_demand * B_alpha * std_LT
+            rop = (self.daily_demand * self.order_lead_time) + (self.daily_demand * B_alpha * safety_stock)
 
         if not self.is_constant_demand and self.is_constant_lead_time:
             safety_stock = B_alpha * std_d * sqrt_LT
@@ -264,7 +261,7 @@ class ContinuousReviewRQPolicy(models.Model):
         return safety_stock, rop
 
     def calculate_rop_in_gamma(self):
-        Q = 0.95
+        Q = self.gamma_distribution_inputs['service_level']/100
         alpha = self.gamma_distribution_inputs['alpha']
         beta = self.gamma_distribution_inputs['beta']
         Q_alpha = norm.ppf(alpha/100, beta/100, Q)
@@ -276,7 +273,7 @@ class ContinuousReviewRQPolicy(models.Model):
             rop = (µd * LT) + Q_alpha
 
         if self.is_constant_demand and not self.is_constant_lead_time:
-            rop = (self.daily_demand * self.average_lead_time) + (self.daily_demand * Q_alpha)
+            rop = (self.daily_demand * self.order_lead_time) + (self.daily_demand * Q_alpha)
 
         if not self.is_constant_demand and self.is_constant_lead_time:
             rop = (µd * LT) + Q_alpha
@@ -288,7 +285,7 @@ class ContinuousReviewRQPolicy(models.Model):
 
     def calculate(self):
         print("Calculating RQ...")
-        self.eoq = round(self.calculate_eoq(), 2)
+
         safety_stock = reorder_point = None
         if self.product.distribution == 'Normal Distribution':
             safety_stock, reorder_point = self.calculate_rop_in_normal()
@@ -300,6 +297,8 @@ class ContinuousReviewRQPolicy(models.Model):
             safety_stock, reorder_point = self.calculate_rop_in_gamma()
         self.safety_stock = round(safety_stock, 2)
         self.reorder_point = round(reorder_point, 2)
+        self.eoq = round(self.calculate_eoq(), 2)
+
         self.save()
 
 
@@ -316,7 +315,8 @@ class PeriodicReviewTSPolicy(models.Model):
         S = self.target_level
         I = self.product.inventory_level
         O = self.product.get_outstanding_orders()
-        Q=S-I+O
+        Q=S-I-O
+        Q = max(Q, 0)
         self.order_quantity = round(Q, 2)
         self.save()
     
@@ -325,15 +325,17 @@ class ContinuousReviewSSPolicy(models.Model):
     name = models.CharField(max_length=100, default="Continuous review policy (s, S)", editable=False)
     abbr = models.CharField(max_length=100, default="s, S", editable=False)
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='continuous_review_ss_policy')
-    maximum_stock_level = models.IntegerField(verbose_name="Maximum Stock Level")
-    minimum_stock_level = models.IntegerField(verbose_name="Minimum Stock Level")
+    maximum_stock_level = models.IntegerField(verbose_name="Maximum Stock Level (S)")
+    minimum_stock_level = models.IntegerField(verbose_name="Minimum Stock Level (s)")
     order_quantity = models.IntegerField(blank=True, null=True, verbose_name="Order Quantity (Q)")
 
     def calculate(self):
         S = self.maximum_stock_level
         I = self.product.inventory_level
         O = self.product.get_outstanding_orders()
-        Q=S-I+O
+        
+        Q=S-I-O
+        Q = max(Q, 0)
         self.order_quantity = round(Q, 2)
         self.save()
 

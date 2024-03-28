@@ -64,7 +64,7 @@
     </div>
 
 
-    <div class="card text-left bg-secondary text-white" id="single-product-section">
+    <div class="card text-left bg-secondary text-white mb-5" id="single-product-section">
       <div class="card-body">
         <h4 class="card-title">Product Detailed analysis</h4>
         <p class="card-text">Select Product from dropdown to view detailed analysis of the product</p>
@@ -122,6 +122,15 @@
         </div>
     </div>
 
+    {% else %}
+
+        <div class="card text-left mt-4 mb-5">
+            <div class="card-body">
+                <h4 class="card-title">No Product Selected</h4>
+                <p class="card-text">Kindly Select any product from dropdown to view its detailed analysis</p>
+            </div>
+        </div>
+
     {% endif %}
 </div>
 
@@ -141,6 +150,7 @@
             options: {
                 scales: {
                     y: {
+                        ticks: { precision: 0 },
                         beginAtZero: true
                     }
                 }
@@ -153,6 +163,19 @@
         new Chart(product_order_status_ctx, {
             type: 'bar',
             data: product_order_status,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                },
+                scales: {
+                    y: {
+                        ticks: { precision: 0 },
+                        beginAtZero: true
+                    }
+                }
+            },
         });        
 
 
@@ -163,8 +186,14 @@
             type: 'line',
             data: product_stockout_data,
             options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                },
                 scales: {
                     y: {
+                        ticks: { precision: 0 },
                         beginAtZero: true
                     }
                 }
@@ -179,6 +208,11 @@
             type: 'bar',
             data: product_leadtime_data,
             options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                },
                 scales: {
                     y: {
                         beginAtZero: true
@@ -257,6 +291,11 @@
     }
 
     $(document).ready(function () {
+
+        $('#single-product').select2({
+            theme: 'bootstrap-5'
+        });
+
         $("#single-product").on('change', function () {
             let selected_product = $(this).val();
             if (selected_product) {

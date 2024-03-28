@@ -190,7 +190,7 @@ def get_stockout_data_api(request):
 
 def get_estimated_days_data_api(request):
 
-    all_orders = Order.objects.all().order_by('id')
+    all_orders = Order.objects.filter(status='Completed').order_by('id')
 
     data = []
     for order in all_orders:
