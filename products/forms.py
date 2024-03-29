@@ -43,7 +43,7 @@ class OrderForm(forms.ModelForm):
 
 
 class NormalDistributionForm(forms.Form):
-    service_level = forms.FloatField(label='Service Level')
+    service_level = forms.FloatField(label='Service Level', min_value=0, max_value=1)
     std_dev_lead_time = forms.FloatField(label='Standard Deviation of Demand during Lead Time (σLT)')
     std_dev_daily_demand = forms.FloatField(label='Standard Deviation of Daily Demand (σd)')
 
@@ -52,14 +52,14 @@ class UniformDistributionForm(forms.Form):
     upper_bound = forms.FloatField(label='Upper Bound (b)')
 
 class BetaDistributionForm(forms.Form):
-    service_level = forms.FloatField(label='Service Level')
-    beta = forms.FloatField(label='Beta (β)')
-    alpha = forms.FloatField(label='Alpha (α)')
+    service_level = forms.FloatField(label='Service Level', min_value=0, max_value=1)
+    beta = forms.FloatField(label='Beta (β)', min_value=0, max_value=1)
+    alpha = forms.FloatField(label='Alpha (α)', min_value=0, max_value=1)
     std_dev_lead_time = forms.FloatField(label='Standard Deviation of Demand during Lead Time (σLT)')
     std_dev_daily_demand = forms.FloatField(label='Standard Deviation of Daily Demand (σd)')
 
 
 class GammaDistributionForm(forms.Form):
-    service_level = forms.FloatField(label='Service Level')
-    beta = forms.FloatField(label='Beta (β)')
-    alpha = forms.FloatField(label='Alpha (α)')
+    service_level = forms.FloatField(label='Service Level', min_value=0, max_value=1)
+    beta = forms.FloatField(label='Beta (β)', min_value=0, max_value=1)
+    alpha = forms.FloatField(label='Alpha (α)', min_value=0, max_value=1)

@@ -4,6 +4,7 @@ from django.db.models import Sum
 import math
 from scipy.stats import norm
 from django.utils import timezone
+import numpy as np
 # python manage.py makemigrations
 # python manage.py migrate
 # python manage.py runserver
@@ -27,6 +28,12 @@ class Product(models.Model):
     
     def get_all_orders(self):
         return self.order_set.all()
+    
+    def get_all_orders_quantities(self):
+        all_orders = self.get_all_orders()
+        all_orders = all_orders.values_list('quantity', flat=True)
+        all_orders = list(all_orders)
+        return all_orders
 
     def get_outstanding_orders(self):
         return self.order_set.filter(status='Awaiting').aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
@@ -139,7 +146,7 @@ class Order(models.Model):
             return 0 
         
     class Meta:
-        ordering = ('created_at',)
+        ordering = ('-created_at',)
 
     def __str__(self):
         return f'OrderID {self.id}'
@@ -163,13 +170,13 @@ class ContinuousReviewRQPolicy(models.Model):
     reorder_point = models.IntegerField(blank=True, null=True, verbose_name="Reorder Point (ROP)")
     safety_stock = models.IntegerField(blank=True, null=True, verbose_name="Safety Stock")
 
-    def calculate_eoq(self):
-        eoq = self.daily_demand * self.order_lead_time + self.safety_stock
-        return eoq
+    def calculate_oq(self):
+        oq = self.daily_demand * self.order_lead_time + self.safety_stock
+        return oq
 
     def calculate_rop_in_normal(self):
         service_level = self.normal_distribution_inputs['service_level']
-        z_alpha = norm.ppf(service_level/100)
+        z_alpha = norm.ppf(service_level)
 
         if not self.is_constant_lead_time and not self.is_constant_demand:
             std_LT = self.normal_distribution_inputs['std_dev_lead_time']
@@ -228,14 +235,13 @@ class ContinuousReviewRQPolicy(models.Model):
 
 
     def calculate_rop_in_beta(self):
-        print("Calculating RQ...")
 
-        quantile = self.beta_distribution_inputs['service_level']/100
+        quantile = self.beta_distribution_inputs['service_level']
         µd = self.average_demand
         LT = self.order_lead_time
         alpha = self.beta_distribution_inputs['alpha']
         beta = self.beta_distribution_inputs['beta']
-        B_alpha = norm.ppf(quantile, alpha/100, beta/100)
+        B_alpha = norm.ppf(quantile, alpha, beta)
         std_LT = self.beta_distribution_inputs['std_dev_lead_time']
         std_d = self.beta_distribution_inputs['std_dev_daily_demand']
         sqrt_LT = math.sqrt(LT)
@@ -244,12 +250,11 @@ class ContinuousReviewRQPolicy(models.Model):
 
         if not self.is_constant_lead_time and not self.is_constant_demand:
             safety_stock = B_alpha * std_LT
-            rop = (µd * LT) + (B_alpha * safety_stock)
-
+            rop = (µd * LT) + safety_stock
 
         if self.is_constant_demand and not self.is_constant_lead_time:
             safety_stock = self.daily_demand * B_alpha * std_LT
-            rop = (self.daily_demand * self.order_lead_time) + (self.daily_demand * B_alpha * safety_stock)
+            rop = (self.daily_demand * self.order_lead_time) + safety_stock
 
         if not self.is_constant_demand and self.is_constant_lead_time:
             safety_stock = B_alpha * std_d * sqrt_LT
@@ -261,10 +266,21 @@ class ContinuousReviewRQPolicy(models.Model):
         return safety_stock, rop
 
     def calculate_rop_in_gamma(self):
-        Q = self.gamma_distribution_inputs['service_level']/100
+        # product = "ABC"
+
+        all_orders_quantities = self.product.get_all_orders_quantities()
+        length_of_order_quantities = len(all_orders_quantities)
+
+        Q = self.gamma_distribution_inputs['service_level']
         alpha = self.gamma_distribution_inputs['alpha']
         beta = self.gamma_distribution_inputs['beta']
-        Q_alpha = norm.ppf(alpha/100, beta/100, Q)
+        
+        # if no orders in database
+        if length_of_order_quantities > 0:
+            Q_alpha = np.quantile(all_orders_quantities, alpha)
+        else:
+            Q_alpha = norm.ppf(Q, alpha, beta)
+    
         µd = self.average_demand
         LT = self.order_lead_time
         safety_stock = Q_alpha
@@ -297,7 +313,7 @@ class ContinuousReviewRQPolicy(models.Model):
             safety_stock, reorder_point = self.calculate_rop_in_gamma()
         self.safety_stock = round(safety_stock, 2)
         self.reorder_point = round(reorder_point, 2)
-        self.eoq = round(self.calculate_eoq(), 2)
+        self.eoq = round(self.calculate_oq(), 2)
 
         self.save()
 

@@ -23,16 +23,14 @@
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-4 pb-3 mb-3">
     <h1 class="h3">Products</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="dropdown">
-            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Add product
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{% url 'products:add-product' 's-s' %}">S,s Policy</a></li>
-              <li><a class="dropdown-item" href="{% url 'products:add-product' 't-s' %}">T,S Policy</a></li>
-              <li><a class="dropdown-item" href="{% url 'products:add-product' 'r-q' %}">R,Q Policy</a></li>
-            </ul>
+    <div class="mb-2 mb-md-0">
+        <p for="">Add Product in</p>
+
+        <div class="btn-group" role="group" aria-label="Basic outlined example">
+          <a href="{% url 'products:add-product' 's-s' %}"type="button" class="btn btn-outline-primary">S,s Policy</a>
+          <a href="{% url 'products:add-product' 't-s' %}"type="button" class="btn btn-outline-primary">T, S Policy</a>
+          <a href="{% url 'products:add-product' 'r-q' %}"type="button" class="btn btn-outline-primary">R, Q Policy</a>
+
         </div>
 
     </div>
@@ -44,7 +42,7 @@
 
   <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab" aria-controls="tab1" aria-selected="true">Continuous review policy (s, S)</button>
+      <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab" aria-controls="tab1" aria-selected="true">Continuous review policy (S, s)</button>
     </li>
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab" aria-controls="tab2" aria-selected="false">Periodic review policy (T, S)</button>
@@ -62,7 +60,7 @@
 
           <div class="card text-left sections" id="s-s">
             <div class="card-header bg-white">
-              <h5 class="my-2">Continuous review policy (s, S)</h5>
+              <h5 class="my-2">Continuous review policy (S, s)</h5>
             </div>
             <div class="card-body p-0">
               <table class="table table-striped m-0 p-0 w-100" id="s-s-table">
@@ -81,7 +79,7 @@
                   {% if not ss %}
                     <tr>
                       <td colspan="7">
-                        No product in s, S policy
+                        No product in S, s policy
                       </td>
                     </tr>
 

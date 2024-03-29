@@ -131,8 +131,13 @@
                   <div class="card-body">
                     {% if policy_name == 'r-q' %}
                         <div class="form-group mb-3">
-                            <label for="">Economic Order Quantity (EOQ)</label>
+                            <label for="">Order Quantity (Q)</label>
                             <h5 class="mt-2">{{ product.get_policy.instance.eoq }}</h5>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="">Outstanding Order Quantity (O)</label>
+                            <h5 class="mt-2">{{ product.get_outstanding_orders }}</h5>
                         </div>
 
                         <div class="form-group mb-3">
@@ -152,6 +157,11 @@
                             <h5 class="mt-2">{{ product.get_policy.instance.order_quantity }}</h5>
                         </div>
 
+                        <div class="form-group">
+                            <label for="">Outstanding Order Quantity (O)</label>
+                            <h5 class="mt-2">{{ product.get_outstanding_orders }}</h5>
+                        </div>
+
                         <div class="form-group mb-3">
                             <label for="">Reorder Point (ROP)</label>
                             {% if policy_name == 's-s' %}
@@ -162,6 +172,11 @@
                         </div>
 
                     {% endif %}
+
+
+
+
+
 
                   </div>
                 </div>
