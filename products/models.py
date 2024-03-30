@@ -177,27 +177,33 @@ class ContinuousReviewRQPolicy(models.Model):
     def calculate_rop_in_normal(self):
         service_level = self.normal_distribution_inputs['service_level']
         z_alpha = norm.ppf(service_level)
+        z_alpha = round(z_alpha, 2)
 
         if not self.is_constant_lead_time and not self.is_constant_demand:
             std_LT = self.normal_distribution_inputs['std_dev_lead_time']
             safety_stock = z_alpha * std_LT
-            safety_stock = math.ceil(safety_stock)
+            
             LT = self.order_lead_time
             µd = self.average_demand
             rop = (µd * LT) + safety_stock
 
         if self.is_constant_demand and not self.is_constant_lead_time:
             std_LT = self.normal_distribution_inputs['std_dev_lead_time']
-            safety_stock = z_alpha * std_LT
-            safety_stock = math.ceil(safety_stock)
-            rop = (self.daily_demand * self.order_lead_time) + (self.daily_demand * safety_stock)
+            
+            safety_stock = math.ceil(z_alpha * std_LT * self.daily_demand)
+
+            print(f"Safety stock = {z_alpha} x {std_LT} x {self.daily_demand} = {safety_stock}")
+
+            safety_stock = safety_stock
+            rop = (self.daily_demand * self.order_lead_time) + (safety_stock)
+            print(f"ROP = ({self.daily_demand} x {self.order_lead_time}) + ({safety_stock}) = {rop}")
 
         if not self.is_constant_demand and self.is_constant_lead_time:
             std_d = self.normal_distribution_inputs['std_dev_daily_demand']
             LT = self.order_lead_time
             sqrt_LT = math.sqrt(LT)
             safety_stock = z_alpha * std_d * sqrt_LT
-            safety_stock = math.ceil(safety_stock)
+            safety_stock = safety_stock
             µd = self.average_demand
 
             rop = (µd * LT) + safety_stock
@@ -205,7 +211,7 @@ class ContinuousReviewRQPolicy(models.Model):
         if self.is_constant_demand and self.is_constant_lead_time:
             std_LT = self.normal_distribution_inputs['std_dev_lead_time']
             safety_stock = z_alpha * std_LT
-            safety_stock = math.ceil(safety_stock)
+            safety_stock = safety_stock
             rop = self.daily_demand * self.order_lead_time
 
         return safety_stock, rop
@@ -223,8 +229,9 @@ class ContinuousReviewRQPolicy(models.Model):
         if not self.is_constant_lead_time and not self.is_constant_demand:
             rop = (µd * LT) + safety_stock
 
-        if self.is_constant_demand and not self.is_constant_lead_time:             
-            rop = (self.daily_demand * self.order_lead_time) + (self.daily_demand * safety_stock)
+        if self.is_constant_demand and not self.is_constant_lead_time: 
+            safety_stock = self.daily_demand * safety_stock
+            rop = (self.daily_demand * self.order_lead_time) + (safety_stock)
 
         if not self.is_constant_demand and self.is_constant_lead_time:
             rop = (µd * LT) + safety_stock
@@ -284,7 +291,8 @@ class ContinuousReviewRQPolicy(models.Model):
             Q_alpha = np.quantile(all_orders_quantities, Q)
         else:
             Q_alpha = gamma.ppf(Q, alpha, scale=beta)
-    
+
+        Q_alpha = math.ceil(Q_alpha)
         µd = self.average_demand
         LT = self.order_lead_time
         safety_stock = Q_alpha
@@ -294,7 +302,10 @@ class ContinuousReviewRQPolicy(models.Model):
             rop = (µd * LT) + Q_alpha
 
         if self.is_constant_demand and not self.is_constant_lead_time:
-            rop = (self.daily_demand * self.order_lead_time) + (self.daily_demand * Q_alpha)
+            safety_stock = Q_alpha * self.daily_demand
+            rop = (self.daily_demand * self.order_lead_time) + (safety_stock)
+            print(f"rop = ({self.daily_demand} * {self.order_lead_time}) + ({safety_stock})")
+            print(f"rop = {rop}")
 
         if not self.is_constant_demand and self.is_constant_lead_time:
             rop = (µd * LT) + Q_alpha
