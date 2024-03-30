@@ -124,10 +124,10 @@
           <script>
 
             $(document).ready(function () {
-              let table = new DataTable('#order-table', {
-                pageLength: 25,
-                autoWidth: false
-              });              
+              // let table = new DataTable('#order-table', {
+              //   pageLength: 25,
+              //   autoWidth: false
+              // });              
               
               $("#id_policy").val('{{request.GET.policy}}');
               $("#id_product").val('{{request.GET.product}}');

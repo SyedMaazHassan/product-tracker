@@ -2,9 +2,10 @@ from django.db import models
 from math import sqrt
 from django.db.models import Sum
 import math
-from scipy.stats import norm, beta
+from scipy.stats import norm, beta, gamma
 from django.utils import timezone
 import numpy as np
+import math
 # python manage.py makemigrations
 # python manage.py migrate
 # python manage.py runserver
@@ -180,7 +181,7 @@ class ContinuousReviewRQPolicy(models.Model):
         if not self.is_constant_lead_time and not self.is_constant_demand:
             std_LT = self.normal_distribution_inputs['std_dev_lead_time']
             safety_stock = z_alpha * std_LT
-            
+            safety_stock = math.ceil(safety_stock)
             LT = self.order_lead_time
             µd = self.average_demand
             rop = (µd * LT) + safety_stock
@@ -188,7 +189,7 @@ class ContinuousReviewRQPolicy(models.Model):
         if self.is_constant_demand and not self.is_constant_lead_time:
             std_LT = self.normal_distribution_inputs['std_dev_lead_time']
             safety_stock = z_alpha * std_LT
-
+            safety_stock = math.ceil(safety_stock)
             rop = (self.daily_demand * self.order_lead_time) + (self.daily_demand * safety_stock)
 
         if not self.is_constant_demand and self.is_constant_lead_time:
@@ -196,7 +197,7 @@ class ContinuousReviewRQPolicy(models.Model):
             LT = self.order_lead_time
             sqrt_LT = math.sqrt(LT)
             safety_stock = z_alpha * std_d * sqrt_LT
-
+            safety_stock = math.ceil(safety_stock)
             µd = self.average_demand
 
             rop = (µd * LT) + safety_stock
@@ -204,6 +205,7 @@ class ContinuousReviewRQPolicy(models.Model):
         if self.is_constant_demand and self.is_constant_lead_time:
             std_LT = self.normal_distribution_inputs['std_dev_lead_time']
             safety_stock = z_alpha * std_LT
+            safety_stock = math.ceil(safety_stock)
             rop = self.daily_demand * self.order_lead_time
 
         return safety_stock, rop
@@ -216,6 +218,7 @@ class ContinuousReviewRQPolicy(models.Model):
         b = self.uniform_distribution_inputs['upper_bound']
         a = self.uniform_distribution_inputs['lower_bound']
         safety_stock = (b - a)/2
+        safety_stock = math.ceil(safety_stock)
 
         if not self.is_constant_lead_time and not self.is_constant_demand:
             rop = (µd * LT) + safety_stock
@@ -249,14 +252,17 @@ class ContinuousReviewRQPolicy(models.Model):
 
         if not self.is_constant_lead_time and not self.is_constant_demand:
             safety_stock = B_alpha * std_LT
+            safety_stock = math.ceil(safety_stock)
             rop = (µd * LT) + safety_stock
 
         if self.is_constant_demand and not self.is_constant_lead_time:
             safety_stock = self.daily_demand * B_alpha * std_LT
+            safety_stock = math.ceil(safety_stock)
             rop = (self.daily_demand * self.order_lead_time) + safety_stock
 
         if not self.is_constant_demand and self.is_constant_lead_time:
             safety_stock = B_alpha * std_d * sqrt_LT
+            safety_stock = math.ceil(safety_stock)
             rop = (µd * LT) + safety_stock
 
         if self.is_constant_demand and self.is_constant_lead_time:
@@ -265,7 +271,6 @@ class ContinuousReviewRQPolicy(models.Model):
         return safety_stock, rop
 
     def calculate_rop_in_gamma(self):
-        # product = "ABC"
 
         all_orders_quantities = self.product.get_all_orders_quantities()
         length_of_order_quantities = len(all_orders_quantities)
@@ -276,13 +281,14 @@ class ContinuousReviewRQPolicy(models.Model):
         
         # if no orders in database
         if length_of_order_quantities > 0:
-            Q_alpha = np.quantile(all_orders_quantities, alpha)
+            Q_alpha = np.quantile(all_orders_quantities, Q)
         else:
-            Q_alpha = norm.ppf(Q, alpha, beta)
+            Q_alpha = gamma.ppf(Q, alpha, scale=beta)
     
         µd = self.average_demand
         LT = self.order_lead_time
         safety_stock = Q_alpha
+        safety_stock = math.ceil(safety_stock)
 
         if not self.is_constant_demand and not self.is_constant_lead_time:
             rop = (µd * LT) + Q_alpha
@@ -312,6 +318,7 @@ class ContinuousReviewRQPolicy(models.Model):
             safety_stock, reorder_point = self.calculate_rop_in_gamma()
         self.safety_stock = round(safety_stock, 2)
         self.reorder_point = round(reorder_point, 2)
+        
         self.eoq = round(self.calculate_oq(), 2)
 
         self.save()

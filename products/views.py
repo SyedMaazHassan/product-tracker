@@ -719,7 +719,7 @@ def edit_product_view(request, policy_name, product_id):
 
 @login_required
 def all_orders_view(request):
-    orders = Order.objects.all()
+    orders = Order.objects.all().order_by("-created_at")
     # completed_orders = orders.filter(status = 'Completed')
     # # Run a loop to add random dates in the completed_at field
     # for order in completed_orders:
