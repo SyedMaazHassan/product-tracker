@@ -239,8 +239,8 @@ class ContinuousReviewRQPolicy(models.Model):
         µd = self.average_demand
         LT = self.order_lead_time
         alpha = self.beta_distribution_inputs['alpha']
-        beta = self.beta_distribution_inputs['beta']
-        B_alpha = beta.ppf(quantile, alpha, beta)
+        B = self.beta_distribution_inputs['beta']
+        B_alpha = beta.ppf(quantile, alpha, B)
         std_LT = self.beta_distribution_inputs['std_dev_lead_time']
         std_d = self.beta_distribution_inputs['std_dev_daily_demand']
         sqrt_LT = math.sqrt(LT)
