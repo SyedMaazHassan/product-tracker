@@ -2,13 +2,12 @@ from django.db import models
 from math import sqrt
 from django.db.models import Sum
 import math
-from scipy.stats import norm
+from scipy.stats import norm, beta
 from django.utils import timezone
 import numpy as np
 # python manage.py makemigrations
 # python manage.py migrate
 # python manage.py runserver
-
 
 class Product(models.Model):
     DISTRIBUTION_CHOICES = [
@@ -241,7 +240,7 @@ class ContinuousReviewRQPolicy(models.Model):
         LT = self.order_lead_time
         alpha = self.beta_distribution_inputs['alpha']
         beta = self.beta_distribution_inputs['beta']
-        B_alpha = norm.ppf(quantile, alpha, beta)
+        B_alpha = beta.ppf(quantile, alpha, beta)
         std_LT = self.beta_distribution_inputs['std_dev_lead_time']
         std_d = self.beta_distribution_inputs['std_dev_daily_demand']
         sqrt_LT = math.sqrt(LT)

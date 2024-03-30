@@ -41,7 +41,6 @@ class OrderForm(forms.ModelForm):
         model = Order
         exclude = ['completed_at']
 
-
 class NormalDistributionForm(forms.Form):
     service_level = forms.FloatField(label='Service Level', min_value=0, max_value=1)
     std_dev_lead_time = forms.FloatField(label='Standard Deviation of Demand during Lead Time (σLT)')
