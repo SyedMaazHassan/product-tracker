@@ -41,7 +41,7 @@
                 <label for="" class="mb-2 fs-5">Filter orders by policy</label>
                     <select class="form-select  change-form" required id="inputGroupSelect04" aria-label="Example select with button addon" name="policy" id="id_policy">
                       <option value="">Select Policy Type</option>
-                      <option value="s, S" {% if request.GET.policy == 's, S' %}selected{% endif %}>s, S Policy</option>
+                      <option value="s, S" {% if request.GET.policy == 's, S' %}selected{% endif %}>S, s Policy</option>
                       <option value="T, S" {% if request.GET.policy == 'T, S' %}selected{% endif %}>T, S Policy</option>
                       <option value="R, Q" {% if request.GET.policy == 'R, Q' %}selected{% endif %}>R, Q Policy</option>
                     </select>
@@ -74,12 +74,12 @@
               <table class="table table-striped m-0 p-0" id="order-table">
                 <thead class="text-white">
                   <tr>
-                    <th scope="col" class="text-center">Order ID</th>
-                    <th scope="col" class="text-center">Product ID</th>
-                    <th scope="col" class="text-center">Quantity</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Estimated Time</th>
-                    <th scope="col">Created at</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Order ID</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Product ID</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Quantity</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Status</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Estimated Time</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Created at</th>
                     <th scope="col"></th>
                   </tr>
                 </thead>
@@ -97,9 +97,9 @@
                     <th class="text-center">{{ order.id }}</th>
                     <td class="text-center">{{ order.product.product_id }}</td>
                     <td class="text-center">{{ order.quantity }}</td>
-                    <td>{{ order.status }}</td>
-                    <td>{{ order.estimated_days }} Days</td>
-                    <td>{{ order.created_at.date }}</td>
+                    <td class="text-center">{{ order.status }}</td>
+                    <td  class="text-center">{{ order.estimated_days }} Days</td>
+                    <td  class="text-center">{{ order.created_at.date }}</td>
                     <td>
                         <a href="{% url 'products:edit-order' order.id %}" class="text-decoration-none">
                             <i class="material-icons mk-pointer">edit</i>

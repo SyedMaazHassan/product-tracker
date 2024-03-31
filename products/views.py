@@ -764,7 +764,8 @@ def create_order_view(request):
             print(form.errors)
             messages.error(request, 'Form submission failed. Please correct the errors.')
     else:
-        form = OrderForm()
+        given_product = request.GET.get('product')
+        form = OrderForm(initial={'product': given_product})
     return render(request, "create-order.html", {'form': form,'page': 'orders'})
 
 

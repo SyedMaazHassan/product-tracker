@@ -27,7 +27,7 @@
         <p for="">Add Product in</p>
 
         <div class="btn-group" role="group" aria-label="Basic outlined example">
-          <a href="{% url 'products:add-product' 's-s' %}"type="button" class="btn btn-outline-primary">S,s Policy</a>
+          <a href="{% url 'products:add-product' 's-s' %}"type="button" class="btn btn-outline-primary">S, s Policy</a>
           <a href="{% url 'products:add-product' 't-s' %}"type="button" class="btn btn-outline-primary">T, S Policy</a>
           <a href="{% url 'products:add-product' 'r-q' %}"type="button" class="btn btn-outline-primary">R, Q Policy</a>
 
@@ -66,12 +66,12 @@
               <table class="table table-striped m-0 p-0 w-100" id="s-s-table">
                 <thead class="text-white">
                   <tr>
-                    <th scope="col" class="text-center">Product ID</th>
-                    <th scope="col" class="text-center">Order Quantity (Q)</th>
-                    <th scope="col">Product Supplier</th>
-                    <th scope="col" class="text-center">Inventory Level</th>
-                    <th scope="col">Stock Level</th>
-                    <th scope="col">Created at</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Product ID</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Order Quantity (Q)</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Product Supplier</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Inventory Level</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Stock Level</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Created at</th>
                     <th scope="col"></th>
                   </tr>
                 </thead>
@@ -87,14 +87,14 @@
 
                   {% for policy in ss %}
                   <tr>
-                    <th class="text-center">{{ policy.product.product_id }}</th>
-                    <td class="text-center">{{ policy.order_quantity }}</td>
-                    <td>{{ policy.product.product_supplier }}</td>
-                    <td class="text-center">{{ policy.product.inventory_level }}</td>
-                    <td>
+                    <th  style="width: 15%;" class="text-center">{{ policy.product.product_id }}</th>
+                    <td  style="width: 15%;" class="text-center">{{ policy.order_quantity }}</td>
+                    <td style="width: 15%;" class="text-center">{{ policy.product.product_supplier }}</td>
+                    <td  style="width: 15%;" class="text-center">{{ policy.product.inventory_level }}</td>
+                    <td style="width: 15%;" class="text-center">
                         <span class="{% if policy.product.stock_level == 'Low' %}text-danger{% else %}text-success{% endif %}">{{ policy.product.stock_level }}</span>
                     </td>
-                    <td>{{ policy.product.created_at.date }}</td>
+                    <td style="width: 15%;" class="text-center">{{ policy.product.created_at.date }}</td>
                     <td>
                         <a href="{% url 'products:edit-product' policy.product.get_policy.key policy.product.product_id %}" class="text-decoration-none">
                             <i class="material-icons mk-pointer">edit</i>
@@ -126,12 +126,12 @@
               <table class="table table-striped m-0 w-100 p-0" id="t-s-table">
                 <thead class="text-white">
                   <tr>
-                    <th scope="col" class="text-center">Product ID</th>
-                    <th scope="col" class="text-center">Order Quantity (Q)</th>
-                    <th scope="col">Product Supplier</th>
-                    <th scope="col" class="text-center">Inventory Level</th>
-                    <th scope="col">Stock Level</th>
-                    <th scope="col">Created at</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Product ID</th>
+                    <th scope="col"  style="width: 15%;" class="text-center">Order Quantity (Q)</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Product Supplier</th>
+                    <th scope="col"  style="width: 15%;" class="text-center">Inventory Level</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Stock Level</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Created at</th>
                     <th scope="col"></th>
                   </tr>
                 </thead>
@@ -146,14 +146,14 @@
 
                   {% for policy in ts %}
                   <tr>
-                    <th class="text-center">{{ policy.product.product_id }}</th>
-                    <td class="text-center">{{ policy.order_quantity }}</td>
-                    <td>{{ policy.product.product_supplier }}</td>
-                    <td class="text-center">{{ policy.product.inventory_level }}</td>
-                    <td>
+                    <th  style="width: 15%;" class="text-center">{{ policy.product.product_id }}</th>
+                    <td  style="width: 15%;" class="text-center">{{ policy.order_quantity }}</td>
+                    <td  style="width: 15%;" class="text-center">{{ policy.product.product_supplier }}</td>
+                    <td  style="width: 15%;" class="text-center">{{ policy.product.inventory_level }}</td>
+                    <td style="width: 15%;" class="text-center">
                         <span class="{% if policy.product.stock_level == 'Low' %}text-danger{% else %}text-success{% endif %}">{{ policy.product.stock_level }}</span>
                     </td>
-                    <td>{{ policy.product.created_at.date }}</td>
+                    <td style="width: 15%;" class="text-center">{{ policy.product.created_at.date }}</td>
                     <td>
                         <a href="{% url 'products:edit-product' policy.product.get_policy.key policy.product.product_id %}" class="text-decoration-none">
                             <i class="material-icons mk-pointer">edit</i>
@@ -186,12 +186,12 @@
               <table class="table w-100 table-striped m-0 p-0" id="r-q-table">
                 <thead class="text-white">
                   <tr>
-                    <th scope="col" class="text-center">Product ID</th>
-                    <th scope="col" class="text-center">EOQ</th>
-                    <th scope="col" class="text-center">Reorder Point</th>
-                    <th scope="col">Distribution</th>
-                    <th scope="col" class="text-center">Inventory Level</th>
-                    <th scope="col">Stock Level</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Product ID</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Order Quantity (Q)</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Reorder Point</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Distribution</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Inventory Level</th>
+                    <th scope="col" style="width: 15%;" class="text-center">Stock Level</th>
                     <th scope="col"></th>
                   </tr>
                 </thead>
@@ -206,12 +206,12 @@
 
                   {% for policy in rq %}
                   <tr>
-                    <th class="text-center">{{ policy.product.product_id }}</th>
-                    <td class="text-center">{{ policy.eoq }}</td>
-                    <td class="text-center">{{ policy.reorder_point }}</td>
-                    <td>{{ policy.product.distribution }}</td>
-                    <td class="text-center">{{ policy.product.inventory_level }}</td>
-                    <td>
+                    <th style="width: 15%;" class="text-center">{{ policy.product.product_id }}</th>
+                    <td style="width: 15%;" class="text-center">{{ policy.eoq }}</td>
+                    <td style="width: 15%;" class="text-center">{{ policy.reorder_point }}</td>
+                    <td style="width: 15%;" class="text-center">{{ policy.product.distribution }}</td>
+                    <td style="width: 15%;" class="text-center">{{ policy.product.inventory_level }}</td>
+                    <td style="width: 15%;" class="text-center">
                         <span class="{% if policy.product.stock_level == 'Low' %}text-danger{% else %}text-success{% endif %}">{{ policy.product.stock_level }}</span>
                     </td>
                     <td>

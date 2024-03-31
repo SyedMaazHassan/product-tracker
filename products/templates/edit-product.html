@@ -118,6 +118,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-lg btn-block">Update Product</button>
+                    <a href="{% url 'products:create-order' %}?product={{ product.id }}" type="button" class="btn btn-secondary btn-lg btn-block">Create Order</a>
 
                 </div>
                 

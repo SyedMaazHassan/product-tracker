@@ -105,7 +105,8 @@ class Product(models.Model):
 
 
     def __str__(self):
-        return f'{self.product_name} ({self.policy_name} Policy)'
+        policy = "S, s" if self.policy_name == 's, S' else self.policy_name
+        return f'{self.product_name} ({policy} Policy)'
 
 
 class Notification(models.Model):
@@ -171,7 +172,8 @@ class ContinuousReviewRQPolicy(models.Model):
     safety_stock = models.IntegerField(blank=True, null=True, verbose_name="Safety Stock")
 
     def calculate_oq(self):
-        oq = self.daily_demand * self.order_lead_time + self.safety_stock
+        O = self.product.get_outstanding_orders()
+        oq = (self.daily_demand * self.order_lead_time) + self.safety_stock - O
         return oq
 
     def calculate_rop_in_normal(self):
@@ -180,7 +182,7 @@ class ContinuousReviewRQPolicy(models.Model):
         z_alpha = round(z_alpha, 2)
 
         if not self.is_constant_lead_time and not self.is_constant_demand:
-            std_LT = self.normal_distribution_inputs['std_dev_lead_time']
+            std_LT = self.normal_disatribution_inputs['std_dev_lead_time']
             safety_stock = z_alpha * std_LT
             
             LT = self.order_lead_time
@@ -210,8 +212,7 @@ class ContinuousReviewRQPolicy(models.Model):
 
         if self.is_constant_demand and self.is_constant_lead_time:
             std_LT = self.normal_distribution_inputs['std_dev_lead_time']
-            safety_stock = z_alpha * std_LT
-            safety_stock = safety_stock
+            safety_stock = 0
             rop = self.daily_demand * self.order_lead_time
 
         return safety_stock, rop
@@ -237,6 +238,7 @@ class ContinuousReviewRQPolicy(models.Model):
             rop = (µd * LT) + safety_stock
 
         if self.is_constant_demand and self.is_constant_lead_time:
+            safety_stock = 0
             rop = self.daily_demand * self.order_lead_time
 
         return safety_stock, rop
@@ -273,6 +275,7 @@ class ContinuousReviewRQPolicy(models.Model):
             rop = (µd * LT) + safety_stock
 
         if self.is_constant_demand and self.is_constant_lead_time:
+            safety_stock = 0
             rop = self.daily_demand * self.order_lead_time
 
         return safety_stock, rop
@@ -311,6 +314,7 @@ class ContinuousReviewRQPolicy(models.Model):
             rop = (µd * LT) + Q_alpha
 
         if self.is_constant_demand and self.is_constant_lead_time:
+            safety_stock = 0
             rop = (self.daily_demand * self.order_lead_time)
 
         return safety_stock, rop
