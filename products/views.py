@@ -56,13 +56,13 @@ def get_inventory_levels_chart():
     start_date = end_date - timedelta(days=365)
     labels = []
     data = {
-        's, S': [],
+        'S, s': [],
         'R, Q': [],
         'T, S': []
     }
     color_mapping = {
         'R, Q': 'rgba(17, 141, 255)',  # Darker color for 'R, Q' policy
-        's, S': 'rgba(18, 35, 158)',   # Darker color for 's, S' policy
+        'S, s': 'rgba(18, 35, 158)',   # Darker color for 's, S' policy
         'T, S': 'rgba(230, 108, 55)'    # Darker color for 'T, S' policy
     }
 
@@ -75,8 +75,9 @@ def get_inventory_levels_chart():
         )
         for entry in products_per_month:
             policy_name = entry['policy_name']
+            new_policy = policy_name if policy_name != "s, S" else "S, s"
             total_inventory = entry['total_inventory']
-            data[policy_name].append(total_inventory)
+            data[new_policy].append(total_inventory)
         labels.append(f'{month_name} {year}')
         start_date = start_date + timedelta(days=30)
 
@@ -102,7 +103,7 @@ def get_orders_chart():
     rq_order = Order.objects.filter(product__policy_name='R, Q').count()
     ss_order = Order.objects.filter(product__policy_name='s, S').count()
     ts_order = Order.objects.filter(product__policy_name='T, S').count()
-    labels = ['s, S', 'R, Q', 'T, S']
+    labels = ['S, s', 'R, Q', 'T, S']
     orders_qty = [ss_order, rq_order, ts_order]
     data = {
         'labels': labels,
@@ -159,7 +160,7 @@ def get_product_chart():
     ts = PeriodicReviewTSPolicy.objects.all().count()
     ss = ContinuousReviewSSPolicy.objects.all().count()
     rq = ContinuousReviewRQPolicy.objects.all().count()
-    labels = ['s, S policy', 'R, Q policy', 'T, S policy']
+    labels = ['S, s policy', 'R, Q policy', 'T, S policy']
     total_products = [ss, rq, ts]
     data = {
         'labels': labels,
@@ -426,7 +427,7 @@ def all_products_view(request):
 @login_required
 def add_product_view(request, policy_name):
     policy_dict = {
-        's-s': ('Continuous review policy (s, S)', ContinuousReviewSSPolicy, ContinuousReviewSSPolicyForm, 's, S'),
+        's-s': ('Continuous review policy (S, s)', ContinuousReviewSSPolicy, ContinuousReviewSSPolicyForm, 'S, s'),
         't-s': ('Periodic review policy (T, S)', PeriodicReviewTSPolicy, PeriodicReviewTSPolicyForm, 'T, S'),
         'r-q': ('Continuous review policy (R, Q)', ContinuousReviewRQPolicy, ContinuousReviewRQPolicyForm, 'R, Q')
     }
@@ -737,7 +738,7 @@ def all_orders_view(request):
 
     policy = request.GET.get('policy')
     product = request.GET.get('product')
-    if policy in ['s, S', 'R, Q', 'T, S']:
+    if policy in ['S, s', 'R, Q', 'T, S']:
         products = Product.objects.filter(policy_name = policy)
         orders = orders.filter(product__in = products)
     
