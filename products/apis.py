@@ -55,7 +55,7 @@ def get_orders_chart_api(request):
     ss_order = Order.objects.filter(product__policy_name='s, S').count()
     ts_order = Order.objects.filter(product__policy_name='T, S').count()
     data = {
-       'S, s': ss_order,
+       's, S': ss_order,
        'R, Q': rq_order,
        'T, S': ts_order 
     }
@@ -68,7 +68,7 @@ def get_product_chart_api(request):
     ss = ContinuousReviewSSPolicy.objects.all().count()
     rq = ContinuousReviewRQPolicy.objects.all().count()
     data = {
-       'S, s Policy': ss,
+       's, S Policy': ss,
        'R, Q Policy': rq,
        'T, S Policy': ts 
     }
