@@ -29,7 +29,8 @@ def update_inventory_level_update(sender, instance, **kwargs):
         InvetorylevelUpdate.objects.create(
             product = instance,
             quantity = instance.inventory_level, 
-            is_stockout = instance.inventory_level < 1,            
+            is_stockout = instance.inventory_level < 1, 
+            created_at = instance.created_at           
         )
 
 

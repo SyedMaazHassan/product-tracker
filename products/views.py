@@ -53,7 +53,7 @@ def search_products(request):
 def get_inventory_levels_chart():
 # Calculate the start date for the last 12 months
     end_date = timezone.now()  # Current date and time
-    start_date = end_date - timedelta(days=365)
+    start_date = end_date - timedelta(days=335)
     labels = []
     data = {
         'S, s': [],
@@ -66,20 +66,37 @@ def get_inventory_levels_chart():
         'T, S': 'rgba(230, 108, 55)'    # Darker color for 'T, S' policy
     }
 
-    for i in range(13):
+    for i in range(12):
         month = start_date.month
         year = start_date.year
         month_name = calendar.month_abbr[month]
         products_per_month = Product.objects.filter(created_at__month=month, created_at__year=year).values('policy_name').annotate(
             total_inventory=Sum('inventory_level')
         )
+        print(products_per_month, "haha")
+        categories = {
+            'S, s': False,
+            'T, S': False,
+            'R, Q': False
+        }
         for entry in products_per_month:
             policy_name = entry['policy_name']
             new_policy = policy_name if policy_name != "s, S" else "S, s"
             total_inventory = entry['total_inventory']
             data[new_policy].append(total_inventory)
+            categories[new_policy] = True
+
+        if not categories['T, S']:
+            data['T, S'].append(0)
+        if not categories['S, s']:
+            data['S, s'].append(0)
+        if not categories['R, Q']:
+            data['R, Q'].append(0)
+            
+            
         labels.append(f'{month_name} {year}')
         start_date = start_date + timedelta(days=30)
+        print(data, month, year)
 
     dataset = {}
     for key, value in data.items():
@@ -92,6 +109,7 @@ def get_inventory_levels_chart():
             'lineTension': 0.3
         }
 
+    print(dataset)
     ready_data = {
         'labels': labels,
         'datasets': list(dataset.values())
@@ -335,6 +353,7 @@ def generate_order_data(product_id):
 
 @login_required
 def dashboard_view(request):
+    create_fake_orders(400)
     product_charts = {}
     selected_product = request.GET.get('product')
     if selected_product:
@@ -502,7 +521,9 @@ def add_product_view(request, policy_name):
                         product.policy_name = policy_name_type
                         product.save()
 
+                        
                         messages.success(request, "Product added successfully")
+                        return redirect("products:add-product", policy_name=policy_name)
                         return redirect("products:all-products")
                     
         except Exception as e:
